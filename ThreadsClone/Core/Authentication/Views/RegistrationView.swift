@@ -13,7 +13,9 @@ struct RegistrationView: View {
     
     var body: some View {
         VStack {
+            
             Spacer()
+            
             Image("threads-logo")
                 .resizable()
                 .scaledToFit()
@@ -21,13 +23,14 @@ struct RegistrationView: View {
                 .padding()
             
             VStack {
-                TextField("Enter your email", text: $viewModel.email)
+                TextField("Enter your e-mail", text: $viewModel.email)
+                    .autocapitalization(.none)
                     .modifier(ThreadsTextFieldModifier())
                 
                 SecureField("Enter your password", text: $viewModel.password)
                     .modifier(ThreadsTextFieldModifier())
                 
-                TextField("Enter your full name", text: $viewModel.fullname)
+                TextField("Enter your fullname", text: $viewModel.fullname)
                     .modifier(ThreadsTextFieldModifier())
 
                 TextField("Enter your username", text: $viewModel.username)
@@ -37,7 +40,7 @@ struct RegistrationView: View {
             Button {
                 Task { try await viewModel.createUser() }
             } label: {
-                Text("Sign Up")
+                Text("Sign up")
                     .modifier(ThreadsButtonModifier())
             }
             .padding(.vertical)

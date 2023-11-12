@@ -8,25 +8,26 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var email = ""
-    @State private var password = ""
+    @StateObject var viewModel = LoginViewModel()
     
     var body: some View {
         NavigationStack{
             VStack {
+            
                 Spacer()
+                
                 Image("threads-logo")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 120, height: 120)
                     .padding()
-                
+                Spacer()
                 VStack {
-                    TextField("Enter your email", text: $email)
+                    TextField("Enter your e-mail", text: $viewModel.email)
                         .autocapitalization(.none)
                         .modifier(ThreadsTextFieldModifier())
                     
-                    SecureField("Enter your password", text: $password)
+                    SecureField("Enter you password", text: $viewModel.password)
                         .modifier(ThreadsTextFieldModifier())
 
                 }
@@ -43,7 +44,7 @@ struct LoginView: View {
                 
                 }
                 Button {
-                    
+                    Task { try await viewModel.login() }
                 } label: {
                     Text("Login")
                         .modifier(ThreadsButtonModifier())
@@ -57,9 +58,9 @@ struct LoginView: View {
                         .navigationBarBackButtonHidden(true)
                 } label: {
                     HStack(spacing: 3) {
-                        Text("Don't have an account?")
+                        Text("Not register yet?")
                         
-                        Text("Sign Up")
+                        Text("Sign up")
                             .fontWeight(.semibold)
                         
                     }

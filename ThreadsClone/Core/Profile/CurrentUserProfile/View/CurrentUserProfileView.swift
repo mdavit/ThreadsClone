@@ -1,5 +1,5 @@
 //
-//  CurrentUserProfile.swift
+//  CurrentUserProfileView.swift
 //  ThreadsClone
 //
 //  Created by Davit Margaryan on 09.11.23.
@@ -9,100 +9,46 @@ import SwiftUI
 
 struct CurrentUserProfileView: View {
     @StateObject var viewModel = CurrentUserProfileViewModel()
-    @State private var selectedFilter: ProfileThreadFilter = .threads
-    @Namespace var animation
+    @State private var showEditProfile = false
     
-    private var filterBarWidth: CGFloat {
-        let count = CGFloat(ProfileThreadFilter.allCases.count)
-        return UIScreen.main.bounds.width / count - 16
-    }
     private var currentUser: User? {
         return viewModel.currentUser
     }
-    
     
     var body: some View {
         NavigationStack{
             ScrollView(showsIndicators: false) {
                 //bio and stacks
-                VStack {
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            //fullname and username
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(currentUser?.fullname ?? "")
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                
-                                Text(currentUser?.username ?? "")
-                                    .font(.subheadline)
-                            }
-                            
-                            if let bio = currentUser?.bio {
-                                Text(bio)
-                                    .font(.footnote)
-                            }
-                            
-                            Text("Broadcasting Authority")
-                                .font(.footnote)
-                            
-                            Text("200M followers")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        Spacer()
-                        
-                        CircularProfileImageView()
-                    }
+                VStack(spacing: 20) {
+                    ProfileHeaderView(user: currentUser)
+                    
                     Button {
-                        
+                        showEditProfile.toggle()
                     } label: {
-                        Text("Follow")
+                        Text("Edit Profile")
                             .font(.subheadline)
                             .fontWeight(.semibold)
-                            .foregroundColor(.white)
+                            .foregroundColor(.black)
                             .frame(width: 352, height: 32)
-                            .background(.black)
+                            .background(.white)
                             .cornerRadius(8)
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color(.systemGray4), lineWidth: 1)
+                            }
                     }
                     
                     // user content list view
-                    VStack {
-                        HStack {
-                            ForEach(ProfileThreadFilter.allCases) { filter in
-                                VStack {
-                                    Text(filter.title)
-                                        .font(.subheadline)
-                                        .fontWeight(selectedFilter == filter ? .semibold : .regular)
-                                    
-                                    if selectedFilter == filter {
-                                        Rectangle()
-                                            .foregroundColor(.black)
-                                            .frame(width: 180, height: 1)
-                                            .matchedGeometryEffect(id: "item", in: animation)
-                                    } else {
-                                        Rectangle()
-                                            .foregroundColor(.clear)
-                                            .frame(width: 180, height: 1)
-                                    }
-                                }
-                                .onTapGesture {
-                                    withAnimation(.spring()) {
-                                        selectedFilter = filter
-                                    }
-                                }
-                            }
-                        }
-                        
-                        LazyVStack {
-                            ForEach(0 ... 10, id: \.self) { thread in
-                                ThreadCell()
-                            }
-                        }
+                    if let user = currentUser {
+                        UserContentListView(user: user)
                     }
-                    .padding(.vertical, 8)
                 }
             }
+            .sheet(isPresented: $showEditProfile, content: {
+                if let user = currentUser {
+                    EditProfileView(user: user)
+            }
+            })
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -115,6 +61,7 @@ struct CurrentUserProfileView: View {
             .padding(.horizontal)
         }
     }
+    
 }
 
 #Preview {
